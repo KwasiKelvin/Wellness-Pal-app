@@ -1,0 +1,214 @@
+from prettytable import PrettyTable
+from googleapiclient.discovery import build
+
+print("This program calculates the BMI (body mass index) of a person")
+# Input height in meters
+height = float(input("What is your height in meters (ex. 1.70): "))
+# Input weight in kilograms
+weight = float(input("Enter your body weight in kg (ex. 70.5): "))
+
+# Calculate BMI and round it to 2 decimal places
+BMI = round(weight / (height * height), 2)
+
+print("BMI classification:")
+# Display the actual BMI value
+print("Your BMI is:", BMI)
+# Assuming BMI is already calculated and stored in the variable BMI
+if BMI <= 18.5:
+    print("You are underweight")
+    bmi_classification = "Underweight"
+elif 18.5 < BMI <= 24.9:
+    print("You have a normal weight")
+    bmi_classification = "Normal weight"
+elif 25 <= BMI <= 29.9:
+    print("You are overweight")
+    bmi_classification = "Overweight"
+else:
+    print("You are obese")
+    bmi_classification = "Obesity"
+
+# Ask the user if they want personalized recommendations
+response = input("Would you like personalized exercise and food recommendations? (yes/no): ")
+if response.lower() == "yes":
+    # Personalized recommendations based on BMI
+    if BMI < 18.5:
+        print(
+            "Recommendations: You may want to focus on increasing your calorie intake and building muscle mass through strength training exercises.")
+    elif 18.5 <= BMI <= 24.9:
+        print("Recommendations: Maintain your current diet and exercise routine to stay healthy and fit.")
+    elif 25 <= BMI <= 29.9:
+        print(
+            "Recommendations: Consider reducing your calorie intake and increasing physical activity to achieve a healthier weight.")
+    else:
+        print(
+            "Recommendations: It's important to focus on adopting a balanced diet and engaging in regular exercise to improve your overall health and manage your weight.")
+
+    # Define exercise routines for each BMI classification
+    exercise_routines = {
+        "Underweight": [
+            ("Monday", "Cardio", "30"),
+            ("Tuesday", "Yoga", "45"),
+            ("Wednesday", "Strength Training", "40"),
+            ("Thursday", "Pilates", "30"),
+            ("Friday", "Rest", "0")
+        ],
+        "Normal weight": [
+            ("Monday", "Cardio", "30"),
+            ("Tuesday", "Strength Training", "45"),
+            ("Wednesday", "Yoga", "40"),
+            ("Thursday", "Rest", "0"),
+            ("Friday", "Cardio", "30")
+        ],
+        "Overweight": [
+            ("Monday", "Cardio", "45"),
+            ("Tuesday", "Strength Training", "40"),
+            ("Wednesday", "Cardio", "45"),
+            ("Thursday", "Rest", "0"),
+            ("Friday", "Cardio", "45")
+        ],
+        "Obesity": [
+            ("Monday", "Cardio", "60"),
+            ("Tuesday", "Strength Training", "50"),
+            ("Wednesday", "Cardio", "60"),
+            ("Thursday", "Strength Training", "50"),
+            ("Friday", "Rest", "0")
+        ]
+    }
+
+    # Display exercise routines for the user's BMI classification
+    print("\nExercise Routines:")
+    exercise_table = PrettyTable(["Day", "Exercise Type", "Duration (mins)"])
+    for routine in exercise_routines[bmi_classification]:
+        exercise_table.add_row(routine)
+    print(exercise_table)
+
+    # Define food plans for each BMI classification
+    food_plans = {
+        "Underweight": [
+            ("Monday", "Breakfast", "Oatmeal"),
+            ("Monday", "Lunch", "Grilled chicken salad"),
+            ("Monday", "Dinner", "Salmon with quinoa"),
+            ("Tuesday", "Breakfast", "Bread & tea with fried eggs"),
+            ("Tuesday", "Lunch", "Rice and stew"),
+            ("Tuesday", "Dinner", "Grilled chicken and roasted sweet potatoes"),
+            # Add more meals for each day...
+        ],
+        "Normal weight": [
+            ("Monday", "Breakfast", "Whole grain toast with sliced tomatoes"),
+            ("Monday", "Lunch", "Grilled chicken with whole wheat bread, lettuce, and tomatoes"),
+            ("Monday", "Dinner", "Yam and garden eggs stew"),
+            ("Tuesday", "Breakfast", "Bread & porridge"),
+            ("Tuesday", "Lunch", "Rice and stew"),
+            ("Tuesday", "Dinner", "Grilled chicken and roasted sweet potatoes"),
+            # Add more meals for each day...
+        ],
+        "Overweight": [
+            ("Monday", "Breakfast", "Veggie omelette with egg whites"),
+            ("Monday", "Lunch", "Palm nut soup and rice"),
+            ("Monday", "Dinner", "Pasta with veggie and tomato sauce"),
+            ("Tuesday", "Breakfast", "Oatmeal made with skim milk"),
+            ("Tuesday", "Lunch", "Rice and stew"),
+            ("Tuesday", "Dinner", "Fruit salad after baked fish"),
+            # Add more meals for each day...
+        ],
+        "Obesity": [
+            ("Monday", "Breakfast", "Fruit salad"),
+            ("Monday", "Lunch", "Grilled shrimp with quinoa salad"),
+            ("Monday", "Dinner", "Baked cod with steamed broccoli"),
+            ("Tuesday", "Breakfast",
+
+             "Veggie omelette with whole wheat toast"),
+            ("Tuesday", "Lunch", "Turkey wrap with whole grain tortilla, lettuce, tomatoes, and avocado"),
+            ("Tuesday", "Dinner", "Fruit salad after baked fish"),
+            # Add more meals for each day...
+        ]
+    }
+
+    # Display food plans for the user's BMI classification
+    print("\nFood Plans:")
+    food_table = PrettyTable(["Day", "Meal", "Food Item"])
+    for plan in food_plans[bmi_classification]:
+        food_table.add_row(plan)
+    print(food_table)
+
+
+    def search_youtube_videos(search_query, max_results=3):
+        # Define API key
+        API_KEY = 'AIzaSyA2Igjo4kJkRihCdyt7aFM40b6ZGCSeaJM'
+
+        # Initialize YouTube Data API client
+        youtube = build('youtube', 'v3', developerKey=API_KEY)
+
+        # Search for exercise videos based on the search query
+        response = youtube.search().list(
+            q=search_query,
+            part='snippet',
+            type='video',
+            maxResults=max_results
+        ).execute()
+
+        # Extract video IDs and titles from the response
+        video_ids = [item['id']['videoId'] for item in response['items']]
+        video_titles = [item['snippet']['title'] for item in response['items']]
+
+        return video_ids, video_titles
+
+
+    def display_youtube_videos(video_ids, video_titles):
+        print("\nHere Are Some Exercise Videos:")
+        for i, (video_id, video_title) in enumerate(zip(video_ids, video_titles), 1):
+            print(f"{i}. {video_title}")
+            print(f"   https://www.youtube.com/watch?v={video_id}\n")
+
+
+    # Ask the user if they want personalized recommendations
+    response = input("Would you like personalized exercise recommendations? (yes/no): ")
+    if response.lower() == "yes":
+        print("Copy and paste the URL in a web browser to watch the video.")
+
+        # Personalized recommendations based on BMI
+        if BMI < 18.5:
+            print(
+                "Recommendations: You may want to focus on increasing your calorie intake and building muscle mass through strength training exercises.")
+            search_query = 'underweight workout'
+        elif 18.5 <= BMI < 24.9:
+            print("Recommendations: Maintain your current diet and exercise routine to stay healthy and fit.")
+            search_query = 'normal weight workout'
+        elif 25 <= BMI < 29.9:
+            print(
+                "Recommendations: Consider reducing your calorie intake and increasing physical activity to achieve a healthier weight.")
+            search_query = 'overweight workout'
+        else:
+            print(
+                "Recommendations: It's important to focus on adopting a balanced diet and engaging in regular exercise to improve your overall health and manage your weight.")
+            search_query = 'obesity workout'
+
+        # Search for exercise videos based on BMI classification
+        video_ids, video_titles = search_youtube_videos(search_query)
+
+        # Display exercise videos
+        display_youtube_videos(video_ids, video_titles)
+
+    # Define exercise routines and food plans...
+
+    # Ask the user if they want advice
+    response = input("Would you like personalized advice on maintaining a healthy lifestyle? (yes/no): ")
+    if response.lower() == "yes":
+        # Display personalized advice
+        print("\nPersonalized Advice:")
+        advice = [
+            "1. Improved physical health: Eating nutritious foods and exercising regularly can help maintain a healthy weight, reduce the risk of chronic diseases like heart disease and diabetes, and boost overall physical well-being.",
+            "2. Increased energy levels: A healthy diet and regular exercise can provide the energy needed for daily activities and help combat fatigue.",
+            "3. Enhanced mental well-being: Eating well and staying active can improve mood, reduce stress, and boost mental clarity and focus.",
+            "4. Stronger immune system: A balanced diet and regular exercise can strengthen the immune system, helping to fight off illnesses and infections.",
+            "5. Better sleep quality: Healthy habits can contribute to better sleep, leading to improved overall health and well-being.",
+            "6. Increased longevity: Research shows that individuals who follow a healthy lifestyle, including a balanced diet and regular exercise, tend to live longer and have a higher quality of life."
+        ]
+
+        for item in advice:
+            print(item)
+
+else:
+    print("No personalized recommendations provided.")
+
+# Print the final statement
